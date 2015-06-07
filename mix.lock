@@ -1,0 +1,8 @@
+%{"conform": {:hex, :conform, "0.13.0"},
+  "emysql": {:git, "git://github.com/Eonblast/Emysql.git", "c7e2103f8b737667f0128802e8de2f0d5ed2fa5c", []},
+  "exactor": {:git, "git://github.com/sasa1977/exactor.git", "0467f8100bc735405d597dbf94996195eb31e0b6", [tag: "0467f8100bc735405d597dbf94996195eb31e0b6"]},
+  "exrm": {:git, "git://github.com/bitwalker/exrm.git", "2b9988998ad59ffba567b86db536114bb6f3e92d", []},
+  "extask": {:git, "git://github.com/timCF/extask.git", "691cc1a515750bead8b81ed6c13cddbcf115d754", []},
+  "exutils": {:git, "git://github.com/timCF/exutils.git", "06c4144ba17ca1f4e83da5cf94859dfa2a38800b", []},
+  "hashex": {:git, "git://github.com/timCF/hashex.git", "cc6b4307daa1ab18c94cdd33bf3cb8a3dab28b96", []},
+  "silverb": {:git, "git://github.com/timCF/silverb.git", "00b8b739491eccf000d4dbc9d3a82ab97a8a9de4", []}}
