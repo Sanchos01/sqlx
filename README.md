@@ -2,7 +2,7 @@ Sqlx
 ====
 
 Usage 
-- configure your mysql pools and mysql timeout in config.exs for app :sqlx
+- configure your mysql pools and mysql timeout (look example in ./config/config.exs)
 - execute awesome mysql queries (look examples in tests)
 
 Public functions

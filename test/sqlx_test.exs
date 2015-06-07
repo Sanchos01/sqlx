@@ -30,10 +30,10 @@ defmodule SqlxTest do
 	#
 	"DELETE FROM test_tab;" |> Sqlx.exec([], :mysql)
 	data = [%{comment: "ONE", ballance: 1}, %{comment: "TWO", ballance: 2}, %{comment: "THREE", ballance: 3}]
-	Sqlx.insert([Enum.at(data,0)], [:comment, :ballance], "test_tab")
-	Sqlx.insert_ignore([Enum.at(data,1)], [:comment, :ballance], "test_tab")
-	Sqlx.insert_duplicate([Enum.at(data,2)], [:comment, :ballance], [], "test_tab")
-	assert Enum.sort(data) == ("SELECT comment, ballance FROM test_tab") |> Sqlx.exec([]) |> Enum.sort
+	Sqlx.insert(data, [:comment, :ballance], "test_tab")
+	Sqlx.insert_ignore(data, [:comment, :ballance], "test_tab")
+	Sqlx.insert_duplicate(data, [:comment, :ballance], [], "test_tab")
+	assert Enum.sort(data++data++data) == ("SELECT comment, ballance FROM test_tab") |> Sqlx.exec([]) |> Enum.sort
   end
 
 end
