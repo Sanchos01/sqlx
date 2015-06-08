@@ -34,6 +34,9 @@ defmodule SqlxTest do
 	Sqlx.insert_ignore(data, [:comment, :ballance], "test_tab")
 	Sqlx.insert_duplicate(data, [:comment, :ballance], [], "test_tab")
 	assert Enum.sort(data++data++data) == ("SELECT comment, ballance FROM test_tab") |> Sqlx.exec([]) |> Enum.sort
+	%{error: [], ok: []} = Sqlx.insert([], [:comment, :ballance], "test_tab")
+	%{error: [], ok: []} = Sqlx.insert_ignore([], [:comment, :ballance], "test_tab")
+	%{error: [], ok: []} = Sqlx.insert_duplicate([], [:comment, :ballance], [], "test_tab")
   end
 
 end

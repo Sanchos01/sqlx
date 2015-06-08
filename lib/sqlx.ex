@@ -83,8 +83,13 @@ defmodule Sqlx do
 
 
 
-	def insert(lst = [_|_], keys = [_|_], tab, pool \\ :mysql), do: insert_proc("", lst, keys, tab, pool)
-	def insert_ignore(lst = [_|_], keys = [_|_], tab, pool \\ :mysql), do: insert_proc("IGNORE", lst, keys, tab, pool)
+	def insert(lst, keys, tab, pool \\ :mysql)
+	def insert([], _, _, _), do: %{ok: [], error: []}
+	def insert(lst = [_|_], keys = [_|_], tab, pool), do: insert_proc("", lst, keys, tab, pool)
+	
+	def insert_ignore(lst, keys, tab, pool \\ :mysql)
+	def insert_ignore([], _, _, _), do: %{ok: [], error: []}
+	def insert_ignore(lst = [_|_], keys = [_|_], tab, pool), do: insert_proc("IGNORE", lst, keys, tab, pool)
 	defp insert_proc(mod, lst, keys, tab, pool) do
 		"""
 		INSERT #{mod} INTO #{tab} 
@@ -94,7 +99,10 @@ defmodule Sqlx do
 		"""
 		|> exec(Enum.map(lst, &(make_args(&1, keys))), pool)
 	end
-	def insert_duplicate(lst = [_|_], keys = [_|_], uniq_keys, tab, pool \\ :mysql) when is_list(uniq_keys) do
+	
+	def insert_duplicate(lst, keys, uniq_keys, tab, pool \\ :mysql)
+	def insert_duplicate([], _, _, _, _), do: %{ok: [], error: []}
+	def insert_duplicate(lst = [_|_], keys = [_|_], uniq_keys, tab, pool) when is_list(uniq_keys) do
 		case 	Stream.filter_map(keys, &(not(Enum.member?(uniq_keys,&1))), &("#{&1} = VALUES(#{&1})"))
 				|> Enum.join(",") do
 			"" -> raise("#{__MODULE__} : no any duplication part of query.. keys #{inspect keys}..  uniq_keys #{inspect uniq_keys}")
