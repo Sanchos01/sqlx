@@ -31,7 +31,7 @@ defmodule Sqlx.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
    	[
-		{:emysql, github: "Eonblast/Emysql"},
+		{:emysql, github: "timCF/Emysql"},
 		{:silverb, github: "timCF/silverb"}
    	]
   end
