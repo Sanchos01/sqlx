@@ -2,8 +2,11 @@ defmodule Sqlx do
 	use Application
 	use Silverb, 	[
 						{"@pools", :application.get_env(:sqlx, :pools, nil)},
-						{"@ttl", :application.get_env(:sqlx, :timeout, nil)}
+						{"@ttl", :application.get_env(:sqlx, :timeout, nil)},
+						{"@escape_q", ~r/(\\*')/},
+						{"@escape_s", ~r/^.*(\\+)$/}
 					]
+	use Logex, [ttl: 100]
 	require Record
 	Record.defrecord :result_packet, Record.extract(:result_packet, from_lib: "emysql/include/emysql.hrl")
 	Record.defrecord :field, Record.extract(:field, from_lib: "emysql/include/emysql.hrl")
@@ -16,7 +19,13 @@ defmodule Sqlx do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
     :application.set_env(:emysql, :default_timeout, @ttl)
-    Enum.each(@pools, fn({name, settings}) -> :ok = :emysql.add_pool(name, settings) end)
+    Enum.each(@pools, fn({name, settings}) -> 
+    	case :emysql.add_pool(name, settings) do
+    		:ok -> 	notice("init mysql pool #{inspect name}")
+    		some -> error("failed to init mysql pool #{inspect name}, error #{inspect some}")
+    				raise("failed to init mysql pool #{inspect name}, error #{inspect some}")
+    	end
+    end)
 
 
     children = [
@@ -41,7 +50,7 @@ defmodule Sqlx do
 			end)
 		resstr
 	end
-	defp prepare_query_proc(bin) when is_binary(bin), do: "'"<>String.replace(bin, "'", "\\'")<>"'"
+	defp prepare_query_proc(bin) when is_binary(bin), do: "'"<>(bin |> escape_q |> escape_s)<>"'"
 	defp prepare_query_proc(int) when is_integer(int), do: to_string(int)
 	defp prepare_query_proc(flo) when is_float(flo), do: Float.to_string(flo, [decimals: 10, compact: true]) 
 	defp prepare_query_proc(lst) when is_list(lst) do
@@ -52,6 +61,25 @@ defmodule Sqlx do
 	defp prepare_query_proc(nil), do: "NULL"
 	defp prepare_query_proc(:undefined), do: "NULL"
 
+	defp escape_q(bin) do
+		case Regex.match?(@escape_q, bin) do
+			false -> bin
+			true -> Regex.replace(@escape_q, bin, 
+					fn(_, x) ->
+						lst = String.codepoints(x)
+						case rem(length(lst), 2) do
+							0 -> Enum.join(lst)
+							1 -> Enum.join(["\\"|lst])
+						end
+					end)
+		end
+	end
+	defp escape_s(bin) do
+		case Regex.match?(@escape_s, bin) do
+			false -> bin
+			true -> bin<>"\\"
+		end
+	end
 
 
 	def exec(query, args, pool \\ :mysql) do

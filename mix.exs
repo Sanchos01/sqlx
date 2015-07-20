@@ -15,7 +15,8 @@ defmodule Sqlx.Mixfile do
     [applications: 	[
     					:logger,
     					:emysql,
-    					:silverb
+    					:silverb,
+              :logex
     				],
      mod: {Sqlx, []}]
   end
@@ -31,8 +32,9 @@ defmodule Sqlx.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
    	[
-		{:emysql, github: "timCF/Emysql"},
-		{:silverb, github: "timCF/silverb"}
+  		{:emysql, github: "timCF/Emysql"},
+  		{:silverb, github: "timCF/silverb"},
+      {:logex, github: "timCF/logex"}
    	]
   end
 end

@@ -15,11 +15,11 @@ defmodule SqlxTest do
 															INSERT INTO test_tab (comment, ballance) VALUES (?),(?);
 															UPDATE test_tab SET ballance = 0 WHERE ballance = ?;
 															"""
-															|> Sqlx.exec([["q'we",3],["e,wq",4],4])
-	[	%{id: id1, ballance: 0, comment: "e,wq"},
+															|> Sqlx.exec([["q\\\'w'e\\'",3],["e,wq\\",4],4])
+	[	%{id: id1, ballance: 0, comment: "e,wq\\"},
 		%{id: id2, ballance: 1, comment: "qwe"},
 		%{id: id3, ballance: 2, comment: "ewq"},
-		%{id: id4, ballance: 3, comment: "q'we"} ] = "SELECT * FROM test_tab;" 
+		%{id: id4, ballance: 3, comment: "q'w'e'"} ] = "SELECT * FROM test_tab;" 
 													 |> Sqlx.exec([]) 
 													 |> Enum.sort_by(fn(%{ballance: b}) -> b end)
 
@@ -37,6 +37,12 @@ defmodule SqlxTest do
 	%{error: [], ok: []} = Sqlx.insert([], [:comment, :ballance], "test_tab")
 	%{error: [], ok: []} = Sqlx.insert_ignore([], [:comment, :ballance], "test_tab")
 	%{error: [], ok: []} = Sqlx.insert_duplicate([], [:comment, :ballance], [], "test_tab")
+	#
+	#	try to break
+	#
+	"INSERT INTO test_tab (comment, ballance) VALUES (?);" |> Sqlx.exec([["(DELETE FROM test_tab;)",3]])
+	"INSERT INTO test_tab (comment, ballance) VALUES (?);" |> Sqlx.exec([["'DELETE FROM test_tab\\",3]])
+	assert 11 == Sqlx.exec("SELECT * FROM test_tab;", []) |> IO.inspect |> length
   end
 
 end
