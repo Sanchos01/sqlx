@@ -16,7 +16,8 @@ defmodule Sqlx.Mixfile do
     					:logger,
     					:emysql,
     					:silverb,
-              :logex
+              :logex,
+              :exutils
     				],
      mod: {Sqlx, []}]
   end
@@ -34,7 +35,8 @@ defmodule Sqlx.Mixfile do
    	[
   		{:emysql, github: "timCF/Emysql"},
   		{:silverb, github: "timCF/silverb"},
-      {:logex, github: "timCF/logex"}
+      {:logex, github: "timCF/logex"},
+      {:exutils, github: "timCF/exutils"}
    	]
   end
 end

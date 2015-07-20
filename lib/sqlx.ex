@@ -3,8 +3,8 @@ defmodule Sqlx do
 	use Silverb, 	[
 						{"@pools", :application.get_env(:sqlx, :pools, nil)},
 						{"@ttl", :application.get_env(:sqlx, :timeout, nil)},
-						{"@escape_q", ~r/(\\*')/},
-						{"@escape_s", ~r/^.*(\\+)$/}
+						{"@escape_reg", [~r/(\\*')/ , ~r/(\\+)$/]},
+						{"@escape_sym", "\\"}
 					]
 	use Logex, [ttl: 100]
 	require Record
@@ -50,7 +50,7 @@ defmodule Sqlx do
 			end)
 		resstr
 	end
-	defp prepare_query_proc(bin) when is_binary(bin), do: "'"<>(bin |> escape_q |> escape_s)<>"'"
+	defp prepare_query_proc(bin) when is_binary(bin), do: "'"<>Enum.reduce(@escape_reg, bin, fn(reg, acc) -> Exutils.Reg.escape(acc, reg, @escape_sym) end)<>"'"
 	defp prepare_query_proc(int) when is_integer(int), do: to_string(int)
 	defp prepare_query_proc(flo) when is_float(flo), do: Float.to_string(flo, [decimals: 10, compact: true]) 
 	defp prepare_query_proc(lst) when is_list(lst) do
@@ -60,27 +60,6 @@ defmodule Sqlx do
 	end
 	defp prepare_query_proc(nil), do: "NULL"
 	defp prepare_query_proc(:undefined), do: "NULL"
-
-	defp escape_q(bin) do
-		case Regex.match?(@escape_q, bin) do
-			false -> bin
-			true -> Regex.replace(@escape_q, bin, 
-					fn(_, x) ->
-						lst = String.codepoints(x)
-						case rem(length(lst), 2) do
-							0 -> Enum.join(lst)
-							1 -> Enum.join(["\\"|lst])
-						end
-					end)
-		end
-	end
-	defp escape_s(bin) do
-		case Regex.match?(@escape_s, bin) do
-			false -> bin
-			true -> bin<>"\\"
-		end
-	end
-
 
 	def exec(query, args, pool \\ :mysql) do
 		case :emysql.execute(pool, prepare_query(query, args)) do
