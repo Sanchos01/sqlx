@@ -53,6 +53,7 @@ defmodule Sqlx do
 	defp prepare_query_proc(bin) when is_binary(bin), do: "'"<>Enum.reduce(@escape_reg, bin, fn(reg, acc) -> Exutils.Reg.escape(acc, reg, @escape_sym) end)<>"'"
 	defp prepare_query_proc(int) when is_integer(int), do: to_string(int)
 	defp prepare_query_proc(flo) when is_float(flo), do: Float.to_string(flo, [decimals: 10, compact: true]) 
+	defp prepare_query_proc(boo) when is_boolean(boo), do: to_string(boo)
 	defp prepare_query_proc(lst) when is_list(lst) do
 		Enum.map(lst, &prepare_query_proc/1)
 		|> List.flatten
