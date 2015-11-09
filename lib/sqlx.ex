@@ -52,8 +52,7 @@ defmodule Sqlx do
 		%{
 			resstr: resstr,
 			args: []
-		} = String.replace(str, "\n", " ")
-			|> String.codepoints
+		} = String.codepoints(str)
 			|> Enum.reduce(%{resstr: "", args: args},
 				fn
 				"?", %{resstr: resstr, args: [arg|rest]} -> %{resstr: resstr<>prepare_query_proc(arg), args: rest}
