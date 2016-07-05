@@ -7,9 +7,9 @@ defmodule SqlxTest do
   end
 
   test "data test" do
-	%{error: [], ok: [Sqlx.ok_packet()]} = 	"DELETE FROM test_tab;" 
+	%{error: [], ok: [Sqlx.ok_packet()]} = 	"DELETE FROM test_tab;"
 											|> Sqlx.exec([], :mysql) # third arg - pool name
-	%{error: [], ok: [Sqlx.ok_packet()]} = 	"INSERT INTO test_tab (comment, ballance) VALUES (?),(?);" 
+	%{error: [], ok: [Sqlx.ok_packet()]} = 	"INSERT INTO test_tab (comment, ballance) VALUES (?),(?);"
 											|> Sqlx.exec([["qwe",1],["ewq",2]]) # by default use :mysql pool name
 	%{error: [], ok: [Sqlx.ok_packet(),Sqlx.ok_packet()]} = """
 															INSERT INTO test_tab (comment, ballance) VALUES (?),(?);
@@ -19,11 +19,11 @@ defmodule SqlxTest do
 	[	%{id: id1, ballance: 0, comment: "e,wq\\"},
 		%{id: id2, ballance: 1, comment: "qwe"},
 		%{id: id3, ballance: 2, comment: "ewq"},
-		%{id: id4, ballance: 3, comment: "q'w'e'"} ] = "SELECT * FROM test_tab;" 
-													 |> Sqlx.exec([]) 
+		%{id: id4, ballance: 3, comment: "q'w'e'"} ] = "SELECT id,ballance,comment FROM test_tab;"
+													 |> Sqlx.exec([])
 													 |> Enum.sort_by(fn(%{ballance: b}) -> b end)
 
-	%{error: [Sqlx.error_packet()], ok: []} = "SELECT * FROM unknown_tab;" |> Sqlx.exec([])
+	%{error: [Sqlx.error_packet()], ok: []} = "SELECT id,ballance,comment FROM unknown_tab;" |> Sqlx.exec([])
 	assert Enum.all?([id1, id2, id3, id4], &is_integer/1)
 	#
 	#	smart inserts

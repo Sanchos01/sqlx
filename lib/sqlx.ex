@@ -92,6 +92,7 @@ defmodule Sqlx do
 				|> Enum.reduce(%{},
 					fn
 					{k,:undefined}, resmap -> Map.put(resmap, k, nil)
+					{k,{:datetime,v}}, resmap -> Map.put(resmap, k, Timex.DateTime.from(v))
 					{k,v}, resmap -> Map.put(resmap, k, v)
 					end)
 			end)
