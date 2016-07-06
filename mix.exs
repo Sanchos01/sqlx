@@ -38,7 +38,7 @@ defmodule Sqlx.Mixfile do
   		{:silverb, github: "timCF/silverb"},
       {:logex, github: "timCF/logex"},
       {:exutils, github: "timCF/exutils"},
-	  {:timex, github: "bitwalker/timex"},
+	  {:timex, github: "bitwalker/timex", tag: "2.2.1"},
    	]
   end
 end
