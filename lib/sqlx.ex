@@ -155,6 +155,26 @@ defmodule Sqlx do
 		end
 	end
 
+	@spec insert_duplicate_non_nil([simple_input], [simple_key], [simple_key], String.t, atom) :: execute_res
+	def insert_duplicate_non_nil(lst, keys, uniq_keys, tab, pool \\ :mysql)
+	def insert_duplicate_non_nil([], _, _, _, _), do: %{ok: [], error: []}
+	def insert_duplicate_non_nil(lst = [_|_], keys = [_|_], uniq_keys, tab, pool) when is_list(uniq_keys) do
+		case 	Stream.filter_map(keys, &(not(Enum.member?(uniq_keys,&1))), &("#{&1} = if(VALUES(#{&1}), VALUES(#{&1}), #{&1})"))
+				|> Enum.join(",") do
+			"" -> raise("#{__MODULE__ |> Atom.to_string} : no any duplication part of query.. keys #{inspect keys}..  uniq_keys #{inspect uniq_keys}")
+			dupl ->
+				"""
+				INSERT INTO #{tab}
+				(#{Enum.join(keys, ",")})
+				VALUES
+				#{Stream.map(lst, fn(_) -> "(?)" end) |> Enum.join(",")}
+				ON DUPLICATE KEY UPDATE
+				#{dupl};
+				"""
+				|> exec(Enum.map(lst, &(make_args(&1, keys))), pool)
+		end
+	end
+
 	@spec make_args(simple_input, [simple_key]) :: [simple_val]
 	defp make_args(map, keys) do
 		Enum.map(keys,
