@@ -17,7 +17,6 @@ defmodule Sqlx.Mixfile do
     					:emysql,
     					:silverb,
               :logex,
-              :exutils,
 			  :timex,
     				],
      mod: {Sqlx, []}]
@@ -37,7 +36,6 @@ defmodule Sqlx.Mixfile do
   		{:emysql, github: "timCF/Emysql"},
   		{:silverb, github: "timCF/silverb"},
       {:logex, github: "timCF/logex"},
-      {:exutils, github: "timCF/exutils"},
 	  {:timex, github: "bitwalker/timex", tag: "2.2.1"},
    	]
   end

@@ -45,7 +45,20 @@ defmodule Sqlx do
 	@type select_res :: [%{atom => any}]
 	@type execute_res :: %{ok: [tuple], error: [tuple]}
 
-
+  @spec escape(String.t, Regex.t, String.t) :: String.t
+  defp escape(bin, escape_reg, escape_sym) do
+    case Regex.match?(escape_reg, bin) do
+      false -> bin
+      true -> Regex.replace(escape_reg, bin,
+          fn(_, x) ->
+            lst = String.codepoints(x)
+            case rem(length(lst), 2) do
+              0 -> Enum.join(lst)
+              1 -> Enum.join([escape_sym|lst])
+            end
+          end)
+    end
+  end
 
 	@spec prepare_query(String.t, [sqlable]) :: String.t
 	def prepare_query(str, args) do
@@ -61,7 +74,7 @@ defmodule Sqlx do
 		resstr
 	end
 	@spec prepare_query_proc(sqlable) :: String.t
-	defp prepare_query_proc(bin) when is_binary(bin), do: "'"<>Enum.reduce(@escape_reg, bin, fn(reg, acc) -> Exutils.Reg.escape(acc, reg, @escape_sym) end)<>"'"
+	defp prepare_query_proc(bin) when is_binary(bin), do: "'"<>Enum.reduce(@escape_reg, bin, fn(reg, acc) -> escape(acc, reg, @escape_sym) end)<>"'"
 	defp prepare_query_proc(int) when is_integer(int), do: Integer.to_string(int)
 	defp prepare_query_proc(flo) when is_float(flo), do: Float.to_string(flo, [decimals: 10, compact: true])
 	defp prepare_query_proc(boo) when is_boolean(boo), do: Atom.to_string(boo)
