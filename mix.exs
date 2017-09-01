@@ -35,7 +35,7 @@ defmodule Sqlx.Mixfile do
    	[
   		{:emysql, github: "timCF/Emysql"},
   		{:silverb, github: "timCF/silverb"},
-      {:logex, github: "timCF/logex"},
+      {:logex, github: "Sanchos01/logex"},
 	  {:timex, github: "bitwalker/timex", tag: "2.2.1"},
    	]
   end
